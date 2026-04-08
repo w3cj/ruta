@@ -18,7 +18,7 @@ export type LinkProps<T extends RoutePath = RoutePath> = {
   onClick?: (e: MouseEvent) => void;
 };
 
-export const Link: FC = <T extends RoutePath>(props: LinkProps<T>) => {
+export const Link = <T extends RoutePath>(props: LinkProps<T>): ReturnType<FC> => {
   const {
     to = "" as T,
     href: targetPath = to,
