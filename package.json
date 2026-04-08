@@ -6,6 +6,9 @@
   "description": "A tiny type-safe client-side router for hono/jsx",
   "author": "",
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/w3cj/ruta"
+  },
   "keywords": [
     "hono",
     "router",
