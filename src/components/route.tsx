@@ -32,7 +32,7 @@ const useCachedParams = (value: RouteParams): RouteParams => {
   return prevRef.current!;
 };
 
-export const Route: FC = <T extends string = string>({ path, nest, match, component: Component, children }: RouteProps<T>) => {
+export const Route = <T extends string = string>({ path, nest, match, component: Component, children }: RouteProps<T>): ReturnType<FC> => {
   const router = useContext(RouterContext);
   const [location] = useLocationFromRouter(router);
   const parentParams = useParams();
