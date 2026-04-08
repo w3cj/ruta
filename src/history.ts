@@ -19,37 +19,37 @@ export type MemoryHistory = History & {
 
 // --- Browser history ---
 
-const NAV_EVENT = "ruta:nav";
+const NAV = "ruta:nav";
+const SYM = Symbol.for(NAV);
 
 const ensureHistoryPatched = (): void => {
-  if ((window as any)[Symbol.for(NAV_EVENT)])
+  if ((window as any)[SYM])
     return;
-  (window as any)[Symbol.for(NAV_EVENT)] = true;
-
-  const wrap = (method: "pushState" | "replaceState"): void => {
-    const orig = history[method].bind(history);
-    history[method] = (state: any, title: string, url?: string | URL | null) => {
+  (window as any)[SYM] = true;
+  for (const m of ["pushState", "replaceState"] as const) {
+    const orig = history[m].bind(history);
+    history[m] = (state: any, title: string, url?: string | URL | null) => {
       orig(state, title, url);
-      dispatchEvent(new Event(NAV_EVENT));
+      dispatchEvent(new Event(NAV));
     };
-  };
-  wrap("pushState");
-  wrap("replaceState");
+  }
 };
+
+const stripQ = (s: string): string => s.startsWith("?") ? s.slice(1) : s;
 
 export const createBrowserHistory = (): History => ({
   location: () => location.pathname,
-  search: () => location.search.startsWith("?") ? location.search.substring(1) : location.search,
+  search: () => stripQ(location.search),
   navigate: (to, opts) => {
     ensureHistoryPatched();
     history[opts?.replace ? "replaceState" : "pushState"](opts?.state ?? null, "", to);
   },
   subscribe: (cb) => {
     ensureHistoryPatched();
-    addEventListener(NAV_EVENT, cb);
+    addEventListener(NAV, cb);
     addEventListener("popstate", cb);
     return () => {
-      removeEventListener(NAV_EVENT, cb);
+      removeEventListener(NAV, cb);
       removeEventListener("popstate", cb);
     };
   },
@@ -60,11 +60,7 @@ export const createBrowserHistory = (): History => ({
 
 let active: History | undefined;
 
-export const getActiveHistory = (): History => {
-  if (!active)
-    active = createBrowserHistory();
-  return active;
-};
+export const getActiveHistory = (): History => active ??= createBrowserHistory();
 
 export const setActiveHistory = (h: History): void => {
   active = h;
@@ -72,20 +68,18 @@ export const setActiveHistory = (h: History): void => {
 
 // --- Hash history ---
 
-const HASH_PREFIX = /^#?\/?/;
-
 export const createHashHistory = (): History => {
-  const subscribers = new Set<() => void>();
-  const notify = (): void => subscribers.forEach(fn => fn());
+  const subs = new Set<() => void>();
+  const notify = (): void => subs.forEach(fn => fn());
+  const HP = /^#?\/?/;
 
   return {
-    location: () => `/${location.hash.replace(HASH_PREFIX, "")}`,
-    search: () => location.search.startsWith("?") ? location.search.substring(1) : location.search,
+    location: () => `/${location.hash.replace(HP, "")}`,
+    search: () => stripQ(location.search),
     navigate: (to, opts) => {
       const { state = null, replace = false } = opts ?? {};
       const oldURL = location.href;
-      const stripped = to.replace(HASH_PREFIX, "");
-      const [hashPart, searchPart] = stripped.split("?");
+      const [hashPart, searchPart] = to.replace(HP, "").split("?");
       const url = new URL(location.href);
       url.hash = `/${hashPart}`;
       if (searchPart)
@@ -98,12 +92,12 @@ export const createHashHistory = (): History => {
       );
     },
     subscribe: (cb) => {
-      subscribers.add(cb);
-      if (subscribers.size === 1)
+      subs.add(cb);
+      if (subs.size === 1)
         addEventListener("hashchange", notify);
       return () => {
-        subscribers.delete(cb);
-        if (subscribers.size === 0)
+        subs.delete(cb);
+        if (subs.size === 0)
           removeEventListener("hashchange", notify);
       };
     },
@@ -120,47 +114,39 @@ export type MemoryHistoryOptions = {
   record?: boolean;
 };
 
+const split = (url: string): [string, string] => {
+  const qi = url.indexOf("?");
+  return qi < 0 ? [url, ""] : [url.slice(0, qi), url.slice(qi + 1)];
+};
+
 export const createMemoryHistory = (opts: MemoryHistoryOptions = {}): MemoryHistory => {
-  const buildInitial = (): string => {
-    let url = opts.path ?? "/";
-    if (opts.searchPath)
-      url += (url.includes("?") ? "&" : "?") + opts.searchPath;
-    return url;
-  };
+  let initial = opts.path ?? "/";
+  if (opts.searchPath)
+    initial += (initial.includes("?") ? "&" : "?") + opts.searchPath;
 
-  const initial = buildInitial();
-  const allEntries: string[] = [initial];
+  const entries: string[] = [initial];
   const watchers = new Set<() => void>();
-  const frozen = opts.static ?? false;
-
-  const split = (url: string): [string, string] => {
-    const qi = url.indexOf("?");
-    return qi < 0 ? [url, ""] : [url.substring(0, qi), url.substring(qi + 1)];
-  };
 
   let [pathname, searchStr] = split(initial);
-  const broadcast = (): void => watchers.forEach(fn => fn());
 
   const set = (to: string, navOpts?: NavigateOptions): void => {
     if (opts.record) {
       if (navOpts?.replace)
-        allEntries.splice(-1, 1, to);
+        entries.splice(-1, 1, to);
       else
-        allEntries.push(to);
+        entries.push(to);
     }
     [pathname, searchStr] = split(to);
-    broadcast();
-  };
-
-  const go = (to: string, navOpts?: NavigateOptions): void => {
-    if (!frozen)
-      set(to, navOpts);
+    watchers.forEach(fn => fn());
   };
 
   return {
     location: () => pathname,
     search: () => searchStr,
-    navigate: go,
+    navigate: (to, navOpts) => {
+      if (!opts.static)
+        set(to, navOpts);
+    },
     subscribe: (cb) => {
       watchers.add(cb);
       return () => {
@@ -168,10 +154,10 @@ export const createMemoryHistory = (opts: MemoryHistoryOptions = {}): MemoryHist
       };
     },
     createHref: href => href,
-    entries: opts.record ? allEntries : undefined,
+    entries: opts.record ? entries : undefined,
     reset: opts.record
       ? () => {
-          allEntries.splice(0, allEntries.length);
+          entries.splice(0, entries.length);
           set(initial);
         }
       : undefined,

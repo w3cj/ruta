@@ -2,39 +2,15 @@ import type { LooseMatchResult, RouteParams } from "./types.js";
 import { PatternRouter } from "hono/router/pattern-router";
 
 const cache = new Map<string, PatternRouter<true>>();
-const TRAILING_SLASH = /\/$/;
-const WILDCARD_KEY = "$w";
+const WK = "$w";
+const NOMATCH: LooseMatchResult = { matched: false, params: {} };
 
-// Rewrite bare `*` and trailing `/*` to Hono's named-capture syntax `:key{.*}`
-// so the matched value is exposed in params.
 const rewriteWildcard = (pattern: string): string => {
   if (pattern === "*")
-    return `/:${WILDCARD_KEY}{.*}`;
+    return `/:${WK}{.*}`;
   if (pattern.endsWith("/*"))
-    return `${pattern.slice(0, -2)}/:${WILDCARD_KEY}{.*}`;
+    return `${pattern.slice(0, -2)}/:${WK}{.*}`;
   return pattern;
-};
-
-const execRegex = (pattern: RegExp, path: string, keys: string[] | false, loose?: boolean): LooseMatchResult => {
-  const execResult = pattern.exec(path);
-  if (!execResult)
-    return { matched: false, params: {} };
-
-  const [$base, ...matches] = execResult;
-  const params: RouteParams = {};
-  if (keys && keys.length > 0) {
-    keys.forEach((key, i) => {
-      params[key] = matches[i];
-    });
-  }
-  else if (execResult.groups) {
-    Object.assign(params, execResult.groups);
-  }
-  matches.forEach((m, i) => {
-    params[i] = m;
-  });
-
-  return { matched: true, params, ...(loose ? { base: $base } : {}) };
 };
 
 export const matchPath = (pattern: string, path: string, loose?: boolean): LooseMatchResult => {
@@ -52,20 +28,17 @@ export const matchPath = (pattern: string, path: string, loose?: boolean): Loose
     cache.set(cacheKey, router);
   }
   const [[result]] = router.match("GET", path);
-  if (!result) {
-    return { matched: false, params: {} };
-  }
+  if (!result)
+    return NOMATCH;
   const params = result[1] as RouteParams;
-  // Extract the internal wildcard capture and expose it as "*"
-  const wildcard = params[WILDCARD_KEY];
-  delete params[WILDCARD_KEY];
-  if (wildcard !== undefined) {
+  const wildcard = params[WK];
+  delete params[WK];
+  if (wildcard !== undefined)
     params["*"] = wildcard;
-  }
   if (loose) {
     const base = wildcard
       ? path.slice(0, path.length - wildcard.length - 1)
-      : path.replace(TRAILING_SLASH, "");
+      : path.replace(/\/$/, "");
     delete params["*"];
     return { matched: true, params, base };
   }
@@ -73,8 +46,14 @@ export const matchPath = (pattern: string, path: string, loose?: boolean): Loose
 };
 
 export const matchRoute = (route: string | RegExp | undefined, path: string, loose?: boolean): LooseMatchResult => {
-  if (route instanceof RegExp)
-    return execRegex(route, path, false, loose);
-
+  if (route instanceof RegExp) {
+    const r = route.exec(path);
+    if (!r)
+      return NOMATCH;
+    const params: RouteParams = { ...r.groups };
+    for (let i = 1; i < r.length; i++)
+      params[i - 1] = r[i];
+    return { matched: true, params, ...(loose ? { base: r[0] } : {}) };
+  }
   return matchPath(route || "*", path, loose);
 };

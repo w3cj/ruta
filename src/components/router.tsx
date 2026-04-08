@@ -2,7 +2,7 @@ import type { Child, FC } from "hono/jsx";
 import type { History } from "../history.js";
 import type { RouteDefinition, RouteEntry } from "../route-types.js";
 import type { RouterContextValue } from "../types.js";
-import { useContext, useMemo, useRef } from "hono/jsx";
+import { useContext, useMemo } from "hono/jsx";
 import { setActiveHistory } from "../history.js";
 import { RouterContext } from "../hooks.js";
 import { Route } from "./route.js";
@@ -24,13 +24,11 @@ export const Router: FC = ({ children, routes: routeDef, history: historyProp, .
   if (historyProp)
     setActiveHistory(historyProp);
 
-  const prevRef = useRef<RouterContextValue>(parent);
   const value = useMemo((): RouterContextValue => {
     if (history === parent.history && base === parent.base)
       return parent;
     return { base, history };
   }, [base, history, parent]);
-  prevRef.current = value;
 
   const content = routeDef
     ? (
