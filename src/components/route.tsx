@@ -34,10 +34,10 @@ const useCachedParams = (value: RouteParams): RouteParams => {
 
 export const Route = <T extends string = string>({ path, nest, match, component: Component, children }: RouteProps<T>): ReturnType<FC> => {
   const router = useContext(RouterContext);
-  const [location] = useLocationFromRouter(router);
+  const { location } = useLocationFromRouter(router);
   const parentParams = useParams();
 
-  const [matched, routeParams, base] = match ?? matchRoute(path, location, nest);
+  const { matched, params: routeParams, base } = match ?? matchRoute(path, location, nest);
 
   const params = useCachedParams({ ...parentParams, ...routeParams });
 

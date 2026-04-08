@@ -18,7 +18,7 @@ const rewriteWildcard = (pattern: string): string => {
 const execRegex = (pattern: RegExp, path: string, keys: string[] | false, loose?: boolean): LooseMatchResult => {
   const execResult = pattern.exec(path);
   if (!execResult)
-    return [false, {}];
+    return { matched: false, params: {} };
 
   const [$base, ...matches] = execResult;
   const params: RouteParams = {};
@@ -34,7 +34,7 @@ const execRegex = (pattern: RegExp, path: string, keys: string[] | false, loose?
     params[i] = m;
   });
 
-  return [true, params, ...(loose ? [$base] : [])] as LooseMatchResult;
+  return { matched: true, params, ...(loose ? { base: $base } : {}) };
 };
 
 export const matchPath = (pattern: string, path: string, loose?: boolean): LooseMatchResult => {
@@ -53,7 +53,7 @@ export const matchPath = (pattern: string, path: string, loose?: boolean): Loose
   }
   const [[result]] = router.match("GET", path);
   if (!result) {
-    return [false, {}];
+    return { matched: false, params: {} };
   }
   const params = result[1] as RouteParams;
   // Extract the internal wildcard capture and expose it as "*"
@@ -67,9 +67,9 @@ export const matchPath = (pattern: string, path: string, loose?: boolean): Loose
       ? path.slice(0, path.length - wildcard.length - 1)
       : path.replace(TRAILING_SLASH, "");
     delete params["*"];
-    return [true, params, base];
+    return { matched: true, params, base };
   }
-  return [true, params];
+  return { matched: true, params };
 };
 
 export const matchRoute = (route: string | RegExp | undefined, path: string, loose?: boolean): LooseMatchResult => {

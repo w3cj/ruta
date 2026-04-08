@@ -12,7 +12,7 @@ describe("useLocation", () => {
   it("returns current pathname", () => {
     let captured: string | undefined;
     const Test = () => {
-      const [location] = useLocation();
+      const { location } = useLocation();
       captured = location;
       return <div>{location}</div>;
     };
@@ -20,24 +20,22 @@ describe("useLocation", () => {
     expect(captured).toBe("/");
   });
 
-  it("returns a [value, navigate] pair", () => {
+  it("returns a { location, navigate } object", () => {
     let result: unknown;
     const Test = () => {
       result = useLocation();
       return <div />;
     };
     render(<Test />, document.getElementById("root")!);
-    expect(Array.isArray(result)).toBe(true);
-    const [location, nav] = result as [string, (...args: unknown[]) => void];
+    const { location, navigate } = result as { location: string; navigate: (...args: unknown[]) => void };
     expect(typeof location).toBe("string");
-    expect(typeof nav).toBe("function");
+    expect(typeof navigate).toBe("function");
   });
 
   it("navigate updates the location", () => {
     let navigate: ((...args: unknown[]) => void) | undefined;
     const Test = () => {
-      const [, nav] = useLocation();
-      navigate = nav;
+      ({ navigate } = useLocation());
       return <div />;
     };
     render(<Test />, document.getElementById("root")!);
@@ -49,7 +47,7 @@ describe("useLocation", () => {
     window.history.replaceState(null, "", "/app/dashboard");
     let captured: string | undefined;
     const Test = () => {
-      const [location] = useLocation();
+      const { location } = useLocation();
       captured = location;
       return <div />;
     };
@@ -61,7 +59,7 @@ describe("useLocation", () => {
     window.history.replaceState(null, "", "/app");
     let captured: string | undefined;
     const Test = () => {
-      const [location] = useLocation();
+      const { location } = useLocation();
       captured = location;
       return <div />;
     };
@@ -73,7 +71,7 @@ describe("useLocation", () => {
     window.history.replaceState(null, "", "/other/path");
     let captured: string | undefined;
     const Test = () => {
-      const [location] = useLocation();
+      const { location } = useLocation();
       captured = location;
       return <div />;
     };
@@ -85,8 +83,7 @@ describe("useLocation", () => {
     window.history.replaceState(null, "", "/app");
     let navigate: ((...args: unknown[]) => void) | undefined;
     const Test = () => {
-      const [, nav] = useLocation();
-      navigate = nav;
+      ({ navigate } = useLocation());
       return <div />;
     };
     render(<Router base="/app"><Test /></Router>, document.getElementById("root")!);
@@ -98,7 +95,7 @@ describe("useLocation", () => {
     window.history.replaceState(null, "", "/foo");
     let captured: string | undefined;
     const Test = () => {
-      const [location] = useLocation();
+      const { location } = useLocation();
       captured = location;
       return <div />;
     };

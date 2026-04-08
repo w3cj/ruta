@@ -28,7 +28,7 @@ const findMatch = (children: Child, path: string): Child | null => {
     if (typeof child.type === "string" && child.props.path == null)
       continue;
     const match = matchRoute(child.props.path, path, child.props.nest);
-    if (match[0])
+    if (match.matched)
       return child;
   }
   return null;

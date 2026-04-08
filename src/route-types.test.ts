@@ -63,7 +63,7 @@ describe("paramsProp", () => {
 describe("typedMatchResult", () => {
   it("includes typed params", () => {
     type Result = TypedMatchResult<"/users/:id">;
-    expectTypeOf<Result>().toEqualTypeOf<[matched: boolean, params: { id: string }]>();
+    expectTypeOf<Result>().toEqualTypeOf<{ matched: boolean; params: { id: string } }>();
   });
 });
 

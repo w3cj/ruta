@@ -34,7 +34,7 @@ export const Link = <T extends RoutePath>(props: LinkProps<T>): ReturnType<FC> =
   } = props as LinkProps<T> & { params?: Record<string, string> };
 
   const router = useContext(RouterContext);
-  const [currentPath, navigate] = useLocationFromRouter(router);
+  const { location: currentPath, navigate } = useLocationFromRouter(router);
 
   const resolved = resolvePath(targetPath as string, params);
 

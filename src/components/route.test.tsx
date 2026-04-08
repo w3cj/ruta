@@ -112,7 +112,7 @@ describe("route with nest prop", () => {
     window.history.replaceState(null, "", "/app/dashboard");
     let innerLocation: string | undefined;
     const Inner = () => {
-      const [loc] = useLocation();
+      const { location: loc } = useLocation();
       innerLocation = loc;
       return <div />;
     };
