@@ -2,7 +2,7 @@
 
 A tiny type-safe client-side router for [hono/jsx](https://hono.dev/docs/guides/jsx-dom) client components.
 
-Zero dependencies, only **2.51 KB** with brotli compression.
+Zero dependencies, only **2.49 KB** with brotli compression.
 
 Inspired by [wouter](https://github.com/molefrog/wouter) and [@tanstack/react-router](https://tanstack.com/router/latest)
 
