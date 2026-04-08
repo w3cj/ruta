@@ -8,7 +8,9 @@ export type SwitchProps = {
   location?: string;
 };
 
-const findMatch = (children: Child, path: string): Child | null => {
+export const Switch: FC = ({ children, location }: SwitchProps) => {
+  const loc = useLocationFromRouter(useContext(RouterContext)).location;
+  const path = location || loc;
   const stack: Child[] = Array.isArray(children) ? [...children] : [children];
   let i = 0;
   while (i < stack.length) {
@@ -20,7 +22,7 @@ const findMatch = (children: Child, path: string): Child | null => {
     }
 
     if (child && typeof child === "object" && "type" in child && child.type === Fragment) {
-      stack.push(...[].concat(child.props.children as any));
+      stack.push(child.props.children as Child);
       continue;
     }
 
@@ -33,14 +35,8 @@ const findMatch = (children: Child, path: string): Child | null => {
 
     const match = matchRoute(c.props.path, path, c.props.nest);
     if (match.matched)
-      return cloneElement(c, { match } as any) as Child;
+      return cloneElement(c, { match } as any) as ReturnType<FC>;
   }
 
-  return null;
-};
-
-export const Switch: FC = ({ children, location }: SwitchProps) => {
-  const router = useContext(RouterContext);
-  const { location: originalLocation } = useLocationFromRouter(router);
-  return findMatch(children, location || originalLocation) as ReturnType<FC>;
+  return null as ReturnType<FC>;
 };

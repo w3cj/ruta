@@ -25,7 +25,7 @@ export default defineConfig({
   plugins: [
     dts({
       include: ["src"],
-      exclude: ["**/*.test.*"],
+      exclude: ["**/*.test.*", "**/*.bench.*"],
       beforeWriteFile: (filePath, content) => ({
         filePath: filePath.replace("/dist/src/", "/dist/"),
         content,

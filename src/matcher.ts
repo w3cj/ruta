@@ -5,26 +5,17 @@ const cache = new Map<string, PatternRouter<true>>();
 const WK = "$w";
 const NOMATCH: LooseMatchResult = { matched: false, params: {} };
 
-const rewriteWildcard = (pattern: string): string => {
-  if (pattern === "*")
-    return `/:${WK}{.*}`;
-  if (pattern.endsWith("/*"))
-    return `${pattern.slice(0, -2)}/:${WK}{.*}`;
-  return pattern;
-};
+const rw = (p: string): string =>
+  p === "*" ? `/:${WK}{.*}` : p.endsWith("/*") ? `${p.slice(0, -2)}/:${WK}{.*}` : p;
 
 export const matchPath = (pattern: string, path: string, loose?: boolean): LooseMatchResult => {
   const cacheKey = loose ? `${pattern}:loose` : pattern;
   let router = cache.get(cacheKey);
   if (!router) {
     router = new PatternRouter<true>();
-    if (loose) {
-      router.add("GET", rewriteWildcard(`${pattern}/*`), true);
-      router.add("GET", pattern, true);
-    }
-    else {
-      router.add("GET", rewriteWildcard(pattern), true);
-    }
+    if (loose)
+      router.add("GET", rw(`${pattern}/*`), true);
+    router.add("GET", loose ? pattern : rw(pattern), true);
     cache.set(cacheKey, router);
   }
   const [[result]] = router.match("GET", path);
