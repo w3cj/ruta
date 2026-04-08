@@ -1,4 +1,4 @@
-import type { Child } from "hono/jsx";
+import type { Child, FC } from "hono/jsx";
 import type { NavigateOptions } from "../history.js";
 import type { ParamsProp, RoutePath } from "../route-types.js";
 import { cloneElement, isValidElement, useContext } from "hono/jsx";
@@ -18,7 +18,7 @@ export type LinkProps<T extends RoutePath = RoutePath> = {
   onClick?: (e: MouseEvent) => void;
 };
 
-export const Link = <T extends RoutePath>(props: LinkProps<T>): Child => {
+export const Link: FC = <T extends RoutePath>(props: LinkProps<T>) => {
   const {
     to = "" as T,
     href: targetPath = to,
@@ -68,7 +68,7 @@ export const Link = <T extends RoutePath>(props: LinkProps<T>): Child => {
     : cls;
 
   if (asChild && isValidElement(children)) {
-    return cloneElement(children as any, { onClick: handleClick, href } as any) as Child;
+    return cloneElement(children as any, { onClick: handleClick, href } as any);
   }
 
   return (

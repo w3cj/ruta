@@ -3,9 +3,7 @@ import type { Child } from "hono/jsx";
 // --- Route registration ---
 
 // eslint-disable-next-line ts/consistent-type-definitions
-export interface RouteMap {}
-
-type HasRoutes = keyof RouteMap extends never ? false : true;
+export interface Register {}
 
 // --- Param extraction ---
 
@@ -27,11 +25,11 @@ export type ExtractParams<T extends string>
 // --- Path types ---
 
 export type RoutePath = HasRoutes extends true
-  ? (keyof RouteMap & string) | (string & {})
+  ? (keyof RegisteredRouteMap & string) | (string & {})
   : string;
 
 export type StrictRoutePath = HasRoutes extends true
-  ? keyof RouteMap & string
+  ? keyof RegisteredRouteMap & string
   : string;
 
 export type ParamsOf<T extends string> = ExtractParams<T>;
@@ -65,3 +63,12 @@ export type RouteDefinition<T extends readonly RouteEntry[]> = {
   readonly routes: T;
   readonly types: PathsToMap<T>;
 };
+
+// --- Derived route map ---
+
+type RegisteredRouteMap = Register extends { routes: infer R extends RouteDefinition<any> }
+  ? R["types"]
+  // eslint-disable-next-line ts/no-empty-object-type
+  : {};
+
+type HasRoutes = keyof RegisteredRouteMap extends never ? false : true;

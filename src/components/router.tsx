@@ -1,4 +1,4 @@
-import type { Child } from "hono/jsx";
+import type { Child, FC } from "hono/jsx";
 import type { History } from "../history.js";
 import type { RouteDefinition, RouteEntry } from "../route-types.js";
 import type { RouterContextValue } from "../types.js";
@@ -15,7 +15,7 @@ export type RouterProps = {
   children?: Child;
 };
 
-export const Router = ({ children, routes: routeDef, history: historyProp, ...props }: RouterProps): Child => {
+export const Router: FC = ({ children, routes: routeDef, history: historyProp, ...props }: RouterProps) => {
   const parent = useContext(RouterContext);
 
   const history = historyProp ?? parent.history;
@@ -34,10 +34,8 @@ export const Router = ({ children, routes: routeDef, history: historyProp, ...pr
 
   const content = routeDef
     ? (
-        // @ts-expect-error Switch/Route return Child which is valid at runtime but too broad for JSX typing
         <Switch>
           {routeDef.routes.map((r: RouteEntry) => (
-            // @ts-expect-error Route returns Child which is valid at runtime but too broad for JSX typing
             <Route key={r.path} path={r.path} component={r.component} />
           ))}
         </Switch>
