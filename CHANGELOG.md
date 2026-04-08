@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/w3cj/ruta/compare/v1.0.2...v1.0.3) (2026-04-08)
+
+
+### Bug Fixes
+
+* update component types; add RoutePath to navigate ([888ca85](https://github.com/w3cj/ruta/commit/888ca855502b5b5924941bfeeb976002dc5660d7))
+* update component types; add RoutePath to navigate ([170a7e6](https://github.com/w3cj/ruta/commit/170a7e65ab635a6b39a7ae6f6cfd355ef70fd3c6))
+
 ## [1.0.2](https://github.com/w3cj/ruta/compare/v1.0.1...v1.0.2) (2026-04-08)
 
 
