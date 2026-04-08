@@ -39,7 +39,7 @@ declare module "@w3cj/ruta" {
 }
 ```
 
-> When `Register` is not augmented, all APIs accept plain strings and `params` is optional.
+> When `Register` is not augmented, all APIs accept plain strings and `params` are optional.
 
 ### `<Router routes={routes} />`
 
