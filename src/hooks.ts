@@ -8,9 +8,9 @@ import { matchRoute } from "./matcher.js";
 
 // --- Paths ---
 
-const normalizeBase = (base?: string): string => base === "/" ? "" : (base ?? "");
+const nb = (base?: string): string => base === "/" ? "" : (base ?? "");
 
-const safeDecode = (str: string): string => {
+const sd = (str: string): string => {
   try {
     return decodeURI(str);
   }
@@ -20,47 +20,38 @@ const safeDecode = (str: string): string => {
 };
 
 export const absolutePath = (to: string, base: string): string =>
-  to.startsWith("~") ? to.substring(1) : normalizeBase(base) + to;
+  to.startsWith("~") ? to.slice(1) : nb(base) + to;
 
 export const relativePath = (base: string | undefined, path: string): string => {
-  const b = safeDecode(normalizeBase(base));
-  const p = safeDecode(path);
+  const b = sd(nb(base));
+  const p = sd(path);
   if (b && p.toLowerCase().startsWith(b.toLowerCase()))
-    return p.substring(b.length) || "/";
+    return p.slice(b.length) || "/";
   return b ? `~${p}` : p || "/";
 };
 
 export const sanitizeSearch = (search: string): string =>
-  safeDecode(search.startsWith("?") ? search.substring(1) : search);
+  sd(search.startsWith("?") ? search.slice(1) : search);
 
 // --- Path resolution ---
-
-const PARAM_RE = /:(\w+)\??/g;
-const WILDCARD_RE = /\*/g;
-const MULTI_SLASH_RE = /\/+/g;
-const TRAILING_SLASH_RE = /\/$/;
 
 export const resolvePath = (pattern: string, params?: Record<string, string>): string => {
   if (!params)
     return pattern;
   return (pattern
-    .replace(PARAM_RE, (_, key) => params[key] ?? "")
-    .replace(WILDCARD_RE, () => params["*"] ?? "")
-    .replace(MULTI_SLASH_RE, "/")
-    .replace(TRAILING_SLASH_RE, "")) || "/";
+    .replace(/:(\w+)\??|\*/g, (_, key) => (key ? params[key] : params["*"]) ?? "")
+    .replace(/\/+/g, "/")
+    .replace(/\/$/, "")) || "/";
 };
 
 // --- Route definition ---
 
-const routeEntry = <const P extends string>(
-  path: P,
-  component: () => Child,
-): RouteEntry<P> => ({ path, component });
+const re = <const P extends string>(path: P, component: () => Child): RouteEntry<P> => ({ path, component });
 
 export const defineRoutes = <const T extends readonly RouteEntry[]>(
-  fn: (route: typeof routeEntry) => [...T],
+  fn: (route: typeof re) => [...T],
 ): RouteDefinition<T> => {
-  const routes = fn(routeEntry);
+  const routes = fn(re);
   return {
     routes,
     types: Object.fromEntries(routes.map(r => [r.path, true])) as RouteDefinition<T>["types"],
@@ -72,19 +63,11 @@ export const defineRoutes = <const T extends readonly RouteEntry[]>(
 export const navigate = <T extends RoutePath>(
   to: T,
   options?: NavigateOptions & ParamsProp<T extends string ? T : string>,
-): void => {
-  const resolved = resolvePath(to, (options as any)?.params);
-  getActiveHistory().navigate(resolved, options);
-};
+): void => getActiveHistory().navigate(resolvePath(to, (options as any)?.params), options);
 
 // --- Context ---
 
-const defaultRouter: RouterContextValue = {
-  base: "",
-  history: getActiveHistory(),
-};
-
-export const RouterContext = createContext<RouterContextValue>(defaultRouter);
+export const RouterContext = createContext<RouterContextValue>({ base: "", history: getActiveHistory() });
 export const ParamsContext = createContext<RouteParams>({});
 
 // --- Hooks ---
@@ -111,8 +94,7 @@ export const useSearch = (): string => {
 
 export const useRoute = <T extends string>(pattern: T | RegExp): TypedMatchResult<T> => {
   const { location } = useLocation();
-  const result = matchRoute(pattern, location);
-  return { matched: result.matched, params: result.params } as TypedMatchResult<T>;
+  return matchRoute(pattern, location) as TypedMatchResult<T>;
 };
 
 export type SetSearchParams = (

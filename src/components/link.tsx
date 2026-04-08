@@ -21,22 +21,22 @@ export type LinkProps<T extends RoutePath = RoutePath> = {
 export const Link = <T extends RoutePath>(props: LinkProps<T>): ReturnType<FC> => {
   const {
     to = "" as T,
-    href: targetPath = to,
+    href: tp = to,
     params,
-    onClick: _onClick,
+    onClick,
     asChild,
     children,
     className: cls,
-    replace: _replace,
-    state: _state,
-    transition: _transition,
+    replace: _r,
+    state: _s,
+    transition: _t,
     ...restProps
   } = props as LinkProps<T> & { params?: Record<string, string> };
 
   const router = useContext(RouterContext);
   const { location: currentPath, navigate } = useLocationFromRouter(router);
 
-  const resolved = resolvePath(targetPath as string, params);
+  const resolved = resolvePath(tp as string, params);
 
   const handleClick = (e: MouseEvent): void => {
     if (
@@ -44,13 +44,13 @@ export const Link = <T extends RoutePath>(props: LinkProps<T>): ReturnType<FC> =
       || e.metaKey
       || e.altKey
       || e.shiftKey
-      || e.button !== 0
+      || e.button
     ) {
       return;
     }
 
-    if (_onClick)
-      _onClick(e);
+    if (onClick)
+      onClick(e);
     if (!e.defaultPrevented) {
       e.preventDefault();
       navigate(resolved, props as NavigateOptions);

@@ -14,37 +14,26 @@ const findMatch = (children: Child, path: string): Child | null => {
   while (i < stack.length) {
     const child = stack[i++];
 
-    // Unwrap arrays inline
     if (Array.isArray(child)) {
       stack.push(...child);
       continue;
     }
 
-    // Unwrap Fragments inline
     if (child && typeof child === "object" && "type" in child && child.type === Fragment) {
-      const nested = child.props.children;
-      if (Array.isArray(nested))
-        stack.push(...nested);
-      else
-        stack.push(nested);
+      stack.push(...[].concat(child.props.children as any));
       continue;
     }
 
     if (!isValidElement(child))
       continue;
 
-    // Skip plain HTML elements without a path prop
-    if (typeof (child as any).type === "string" && (child as any).props.path == null)
+    const c = child as any;
+    if (typeof c.type === "string" && c.props.path == null)
       continue;
 
-    const match = matchRoute(
-      (child as any).props.path,
-      path,
-      (child as any).props.nest,
-    );
-
+    const match = matchRoute(c.props.path, path, c.props.nest);
     if (match.matched)
-      return cloneElement(child as any, { match } as any) as Child;
+      return cloneElement(c, { match } as any) as Child;
   }
 
   return null;

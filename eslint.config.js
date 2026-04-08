@@ -22,6 +22,7 @@ export default antfu({
   },
 }, {
   rules: {
+    "e18e/prefer-static-regex": "off",
     "ts/prefer-optional-chain": "off",
     "unicorn/prefer-ternary": "error",
     "antfu/top-level-function": "off",

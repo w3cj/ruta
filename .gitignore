@@ -147,4 +147,4 @@ wouter
 .claude
 
 # size-limit reports
-esbuild-why-*.html
+esbuild-why*.html
