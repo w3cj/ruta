@@ -67,13 +67,13 @@ describe("typedMatchResult", () => {
   });
 });
 
-describe("routePath (without RouteMap augmentation)", () => {
-  it("is string when RouteMap is empty", () => {
+describe("routePath (without Register augmentation)", () => {
+  it("is string when Register is empty", () => {
     // When no routes are registered, RoutePath should accept any string
     expectTypeOf<RoutePath>().toEqualTypeOf<string>();
   });
 
-  it("strictRoutePath is string when RouteMap is empty", () => {
+  it("strictRoutePath is string when Register is empty", () => {
     expectTypeOf<StrictRoutePath>().toEqualTypeOf<string>();
   });
 });

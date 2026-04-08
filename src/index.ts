@@ -37,8 +37,8 @@ export { matchPath, matchRoute } from "./matcher.js";
 export type {
   ExtractParams,
   ParamsOf,
+  Register,
   RouteDefinition,
-  RouteMap,
   RoutePath,
   StrictRoutePath,
   TypedMatchResult,

@@ -1,4 +1,4 @@
-import type { Child } from "hono/jsx";
+import type { Child, FC } from "hono/jsx";
 import type { ExtractParams } from "../route-types.js";
 import type { LooseMatchResult, RouteParams } from "../types.js";
 import { useContext, useRef } from "hono/jsx";
@@ -32,7 +32,7 @@ const useCachedParams = (value: RouteParams): RouteParams => {
   return prevRef.current!;
 };
 
-export const Route = <T extends string = string>({ path, nest, match, component: Component, children }: RouteProps<T>): Child | null => {
+export const Route: FC = <T extends string = string>({ path, nest, match, component: Component, children }: RouteProps<T>) => {
   const router = useContext(RouterContext);
   const [location] = useLocationFromRouter(router);
   const parentParams = useParams();
@@ -51,7 +51,6 @@ export const Route = <T extends string = string>({ path, nest, match, component:
       : children;
 
   const wrapped = base
-    // @ts-expect-error Router returns Child which is valid at runtime but too broad for JSX typing
     ? <Router base={base}>{content}</Router>
     : content;
 

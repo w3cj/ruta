@@ -1,10 +1,10 @@
-import type { Child } from "hono/jsx";
+import type { Child, FC } from "hono/jsx";
 import { cloneElement, Fragment, isValidElement, useContext } from "hono/jsx";
 import { RouterContext, useLocationFromRouter } from "../hooks.js";
 import { matchRoute } from "../matcher.js";
 
 export type SwitchProps = {
-  children: Child;
+  children?: Child;
   location?: string;
 };
 
@@ -50,8 +50,8 @@ const findMatch = (children: Child, path: string): Child | null => {
   return null;
 };
 
-export const Switch = ({ children, location }: SwitchProps): Child | null => {
+export const Switch: FC = ({ children, location }: SwitchProps) => {
   const router = useContext(RouterContext);
   const [originalLocation] = useLocationFromRouter(router);
-  return findMatch(children, location || originalLocation);
+  return findMatch(children, location || originalLocation) as ReturnType<FC>;
 };

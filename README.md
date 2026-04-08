@@ -30,15 +30,16 @@ export const routes = defineRoutes(route => [
 
 Register route types globally at the bottom of the same file:
 
-<!-- eslint-skip -->
-
 ```ts
 declare module "@w3cj/ruta" {
-  interface RouteMap extends typeof routes.types {}
+  // eslint-disable-next-line ts/consistent-type-definitions
+  interface Register {
+    routes: typeof routes;
+  }
 }
 ```
 
-> When `RouteMap` is not augmented, all APIs accept plain strings and `params` is optional.
+> When `Register` is not augmented, all APIs accept plain strings and `params` is optional.
 
 ### `<Router routes={routes} />`
 
