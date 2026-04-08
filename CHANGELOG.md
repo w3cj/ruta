@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/w3cj/ruta/compare/v1.1.0...v1.1.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* readme typo ([3b03398](https://github.com/w3cj/ruta/commit/3b03398813bc368715b83e4054e30636168c96ff))
+* readme typo ([#10](https://github.com/w3cj/ruta/issues/10)) ([667b742](https://github.com/w3cj/ruta/commit/667b742bdf51b9a91ecebb46dbdb1aafb2c73f6c))
+
 ## [1.1.0](https://github.com/w3cj/ruta/compare/v1.0.3...v1.1.0) (2026-04-08)
 
 
