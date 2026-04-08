@@ -10,7 +10,7 @@ export type RedirectProps<T extends RoutePath = RoutePath> = NavigateOptions & {
 
 export const Redirect = <T extends RoutePath>(props: RedirectProps<T>): null => {
   const { to, href = to, params } = props as RedirectProps<T> & { params?: Record<string, string> };
-  const [, navigate] = useLocation();
+  const { navigate } = useLocation();
   const propsRef = useRef(props);
   propsRef.current = props;
   const navigateRef = useRef(navigate);

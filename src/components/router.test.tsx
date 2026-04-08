@@ -14,7 +14,7 @@ describe("router", () => {
     window.history.replaceState(null, "", "/app/dashboard");
     let captured: string | undefined;
     const Test = () => {
-      const [location] = useLocation();
+      const { location } = useLocation();
       captured = location;
       return <div />;
     };
@@ -114,7 +114,7 @@ describe("router history prop", () => {
     const mem = createMemoryHistory({ path: "/mem" });
     let captured: string | undefined;
     const Test = () => {
-      const [loc] = useLocation();
+      const { location: loc } = useLocation();
       captured = loc;
       return <div />;
     };

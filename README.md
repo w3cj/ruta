@@ -2,7 +2,7 @@
 
 A tiny type-safe client-side router for [hono/jsx](https://hono.dev/docs/guides/jsx-dom) client components.
 
-Zero dependencies, only **2.6 KB** with brotli compression.
+Zero dependencies, only **2.62 KB** with brotli compression.
 
 Inspired by [wouter](https://github.com/molefrog/wouter) and [@tanstack/react-router](https://tanstack.com/router/latest)
 
@@ -134,7 +134,7 @@ Returns a typed match result.
 ```tsx
 import { useRoute } from "@w3cj/ruta";
 
-const [match, params] = useRoute("/posts/:year/:slug");
+const { matched, params } = useRoute("/posts/:year/:slug");
 // params: { year: string; slug: string }
 ```
 
@@ -284,13 +284,23 @@ Navigates immediately on mount.
 Provides routing context. Optional — browser history is used by default.
 
 ```tsx
-<Router base="/app">
+<Router>
   <App />
 </Router>;
 ```
 
 ```tsx
 <Router history={createHashHistory()}>
+  <App />
+</Router>;
+```
+
+#### Base Path
+
+Prepend all routes with a base path.
+
+```tsx
+<Router base="/dashboard">
   <App />
 </Router>;
 ```
@@ -302,7 +312,7 @@ Provides routing context. Optional — browser history is used by default.
 Returns the current path and a navigate function.
 
 ```tsx
-const [path, navigate] = useLocation();
+const { location, navigate } = useLocation();
 
 navigate("/about");
 navigate("/login", { replace: true });
@@ -313,9 +323,9 @@ navigate("/login", { replace: true });
 Matches a pattern against the current path.
 
 ```tsx
-const [match, params] = useRoute("/users/:id");
+const { matched, params } = useRoute("/users/:id");
 
-if (match) {
+if (matched) {
   console.log(params.id);
 }
 ```
@@ -342,7 +352,7 @@ const search = useSearch(); // "sort=name&page=2"
 Returns `URLSearchParams` and a setter.
 
 ```tsx
-const [params, setParams] = useSearchParams();
+const { params, setParams } = useSearchParams();
 
 const sort = params.get("sort");
 
@@ -361,7 +371,7 @@ Returns the current router context.
 
 ```tsx
 const router = useRouter();
-console.log(router.base); // "/app"
+console.log(router.base); // "/"
 ```
 
 ## Pattern Matching
@@ -371,14 +381,14 @@ Match paths directly without hooks or components.
 ```tsx
 import { matchPath, matchRoute } from "@w3cj/ruta";
 
-const [matched, params] = matchPath("/users/:id", "/users/42");
+const { matched, params } = matchPath("/users/:id", "/users/42");
 // matched: true, params: { id: "42" }
 
-const [m, p] = matchPath("/files/*", "/files/a/b/c");
-// m: true, p: { "*": "a/b/c" }
+const result = matchPath("/files/*", "/files/a/b/c");
+// result.matched: true, result.params: { "*": "a/b/c" }
 
-const [m2, p2] = matchRoute(/^\/post-(?<slug>\w+)$/, "/post-hello");
-// m2: true, p2: { slug: "hello" }
+const match = matchRoute(/^\/post-(?<slug>\w+)$/, "/post-hello");
+// match.matched: true, match.params: { slug: "hello" }
 ```
 
 ## Path Utilities

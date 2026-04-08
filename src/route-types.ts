@@ -34,10 +34,10 @@ export type StrictRoutePath = HasRoutes extends true
 
 export type ParamsOf<T extends string> = ExtractParams<T>;
 
-export type TypedMatchResult<T extends string> = [
-  matched: boolean,
-  params: ExtractParams<T>,
-];
+export type TypedMatchResult<T extends string> = {
+  matched: boolean;
+  params: ExtractParams<T>;
+};
 
 // --- Params prop helper ---
 

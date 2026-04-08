@@ -43,7 +43,7 @@ const findMatch = (children: Child, path: string): Child | null => {
       (child as any).props.nest,
     );
 
-    if (match[0])
+    if (match.matched)
       return cloneElement(child as any, { match } as any) as Child;
   }
 
@@ -52,6 +52,6 @@ const findMatch = (children: Child, path: string): Child | null => {
 
 export const Switch: FC = ({ children, location }: SwitchProps) => {
   const router = useContext(RouterContext);
-  const [originalLocation] = useLocationFromRouter(router);
+  const { location: originalLocation } = useLocationFromRouter(router);
   return findMatch(children, location || originalLocation) as ReturnType<FC>;
 };

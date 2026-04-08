@@ -14,7 +14,7 @@ describe("useSearchParams", () => {
     window.history.replaceState(null, "", "/users?active=true");
     let params: URLSearchParams | undefined;
     const Test = () => {
-      [params] = useSearchParams();
+      ({ params } = useSearchParams());
       return <div />;
     };
     render(<Test />, document.getElementById("root")!);
@@ -25,8 +25,7 @@ describe("useSearchParams", () => {
     window.history.replaceState(null, "", "/users?active=true");
     let setParams: ((v: URLSearchParams) => void) | undefined;
     const Test = () => {
-      const [, set] = useSearchParams();
-      setParams = set;
+      ({ setParams } = useSearchParams());
       return <div />;
     };
     render(<Test />, document.getElementById("root")!);
@@ -38,7 +37,7 @@ describe("useSearchParams", () => {
     const mem = createMemoryHistory({ path: "/page", searchPath: "x=1" });
     let params: URLSearchParams | undefined;
     const Test = () => {
-      [params] = useSearchParams();
+      ({ params } = useSearchParams());
       return <div />;
     };
     render(
@@ -54,7 +53,7 @@ describe("useSearchParams", () => {
     window.history.replaceState(null, "", "/page?name=%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82");
     let params: URLSearchParams | undefined;
     const Test = () => {
-      [params] = useSearchParams();
+      ({ params } = useSearchParams());
       return <div />;
     };
     render(<Test />, document.getElementById("root")!);
@@ -65,7 +64,7 @@ describe("useSearchParams", () => {
     window.history.replaceState(null, "", "/?search=foo%26injected%3Dbar");
     let params: URLSearchParams | undefined;
     const Test = () => {
-      [params] = useSearchParams();
+      ({ params } = useSearchParams());
       return <div />;
     };
     render(<Test />, document.getElementById("root")!);

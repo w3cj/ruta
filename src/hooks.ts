@@ -93,16 +93,16 @@ export const useRouter = (): RouterContextValue => useContext(RouterContext);
 
 export const useParams = <T extends string = string>(): ExtractParams<T> => useContext(ParamsContext) as ExtractParams<T>;
 
-export const useLocationFromRouter = (router: RouterContextValue): [string, NavigateFn] => {
+export const useLocationFromRouter = (router: RouterContextValue): { location: string; navigate: NavigateFn } => {
   const { history, base } = router;
   const loc = useSyncExternalStore(history.subscribe, history.location);
-  return [
-    relativePath(base, loc),
-    (to, opts) => history.navigate(absolutePath(to, base), opts),
-  ];
+  return {
+    location: relativePath(base, loc),
+    navigate: (to, opts) => history.navigate(absolutePath(to, base), opts),
+  };
 };
 
-export const useLocation = (): [string, NavigateFn] => useLocationFromRouter(useContext(RouterContext));
+export const useLocation = (): { location: string; navigate: NavigateFn } => useLocationFromRouter(useContext(RouterContext));
 
 export const useSearch = (): string => {
   const { history } = useContext(RouterContext);
@@ -110,9 +110,9 @@ export const useSearch = (): string => {
 };
 
 export const useRoute = <T extends string>(pattern: T | RegExp): TypedMatchResult<T> => {
-  const [path] = useLocation();
-  const result = matchRoute(pattern, path);
-  return [result[0], result[1]] as TypedMatchResult<T>;
+  const { location } = useLocation();
+  const result = matchRoute(pattern, location);
+  return { matched: result.matched, params: result.params } as TypedMatchResult<T>;
 };
 
 export type SetSearchParams = (
@@ -120,8 +120,8 @@ export type SetSearchParams = (
   options?: NavigateOptions,
 ) => void;
 
-export const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
-  const [loc, nav] = useLocation();
+export const useSearchParams = (): { params: URLSearchParams; setParams: SetSearchParams } => {
+  const { location, navigate } = useLocation();
   const search = useSearch();
   const searchParams = useMemo(() => new URLSearchParams(search), [search]);
 
@@ -129,8 +129,8 @@ export const useSearchParams = (): [URLSearchParams, SetSearchParams] => {
     const next = new URLSearchParams(
       typeof nextInit === "function" ? nextInit(searchParams) : nextInit,
     );
-    nav(`${loc}?${next}`, options);
-  }, [loc, nav, searchParams]);
+    navigate(`${location}?${next}`, options);
+  }, [location, navigate, searchParams]);
 
-  return [searchParams, setSearchParams];
+  return { params: searchParams, setParams: setSearchParams };
 };
