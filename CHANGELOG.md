@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2](https://github.com/w3cj/ruta/compare/ruta-v1.1.1...ruta-v1.1.2) (2026-04-08)
+
+### Bug Fixes
+
+* release-please config ([#12](https://github.com/w3cj/ruta/issues/12)) ([d2580ec](https://github.com/w3cj/ruta/commit/d2580ec2cff630e3107b096b8393aa018fe7cf29))
+
 ## [1.1.1](https://github.com/w3cj/ruta/compare/v1.1.0...v1.1.1) (2026-04-08)
 
 
