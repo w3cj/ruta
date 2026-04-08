@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/w3cj/ruta/compare/v1.0.3...v1.1.0) (2026-04-08)
+
+
+### Features
+
+* hook ergonomics ([2ab64fd](https://github.com/w3cj/ruta/commit/2ab64fd359d7bd8864873a21a58bd8e02d4f6355))
+* hook ergonomics ([47c7647](https://github.com/w3cj/ruta/commit/47c7647968694d198cb4e7d194b7bb9a5b9fda55))
+
 ## [1.0.3](https://github.com/w3cj/ruta/compare/v1.0.2...v1.0.3) (2026-04-08)
 
 
