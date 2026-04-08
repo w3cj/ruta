@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/w3cj/ruta/compare/v1.0.0...v1.0.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* update repo url in package.json ([4a03462](https://github.com/w3cj/ruta/commit/4a034624707a061e3d9ec8495186d501cf959d9f))
+
 ## 1.0.0 (2026-04-08)
 
 
